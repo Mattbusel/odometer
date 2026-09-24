@@ -1,0 +1,30 @@
+Odometer is the maintenance log that lives in the glovebox of your phone. Log a fill-up at the pump or a service in the waiting room, and it tells you what is due next, when, and what the car really costs.
+
+Type the reading off the dash and the digits roll over like a real odometer. Every reading sharpens your pace, and the pace turns "due at 58,390 miles" into "about February 3rd".
+
+WHAT IS DUE
+• Oil, tires, filters, brake fluid, coolant, transmission, plugs, battery, timing belt, wipers, plus your own jobs
+• Counted from the last time each one was done, in miles and months
+• Intervals you can change per car, and jobs you can switch off
+• Overdue, due soon, and a gauge showing how much of the interval is used up
+
+LOG IT IN SECONDS
+• Services with shop or DIY, parts, labor and a note
+• Fill-ups with mpg or L/100km from one full tank to the next
+• Insurance, registration, parking, tolls and washes
+
+THE REAL COST
+• Cost per month and per mile since you got the car
+• The last twelve months by month and by category
+• Fuel economy trend and cost per mile at the pump
+
+THE GLOVEBOX
+• Insurance renewal, registration, inspection and warranty dates, with a countdown
+• Optional reminder two weeks before, as a local notification
+
+THE HISTORY A BUYER WANTS
+• A clean service history PDF with every job, mileage, shop and cost, ready to share when you sell
+
+Miles or kilometres, gallons or litres, your currency. As many cars as you own. Export everything as CSV.
+
+No account, no ads, no tracking. Everything stays on your phone.
