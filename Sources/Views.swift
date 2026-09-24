@@ -761,7 +761,7 @@ struct HistorySheet: View {
         SheetPage(title: "Service history") {
             Text("The document a buyer wants to see. Share it as a PDF.").font(.ui(13, .medium)).foregroundStyle(Dash.grey)
             if let pdf { ShareLink(item: pdf) { HStack { Image(systemName: "square.and.arrow.up"); Text("Share PDF") }.font(.ui(15, .heavy)).foregroundStyle(Dash.bg).frame(maxWidth: .infinity).padding(.vertical, 14).background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Dash.amber)) } }
-            HistoryDoc(vehicle: v).environment(store).clipShape(RoundedRectangle(cornerRadius: 12)).shadow(color: .black.opacity(0.5), radius: 20, y: 10)
+            DocPreview { HistoryDoc(vehicle: v).environment(store) }
         }
         .task { pdf = await render(v) }
     }
@@ -827,6 +827,24 @@ struct HistoryDoc: View {
             Text("Produced with Odometer. Records entered by the owner.").font(.system(size: 7, weight: .medium)).foregroundStyle(.gray).padding(.top, 8)
         }
         .padding(28).frame(width: 612, alignment: .topLeading).background(Color(red: 0.99, green: 0.98, blue: 0.96))
+    }
+}
+
+struct DocHeightKey: PreferenceKey { static var defaultValue: CGFloat = 0; static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = max(value, nextValue()) } }
+
+/// Shows a 612pt-wide document scaled to the phone's width.
+struct DocPreview<Content: View>: View {
+    @ViewBuilder var content: Content
+    @State private var height: CGFloat = 400
+    var body: some View {
+        let w = UIScreen.main.bounds.width - 36
+        let s = w / 612
+        content
+            .background(GeometryReader { g in Color.clear.preference(key: DocHeightKey.self, value: g.size.height) })
+            .onPreferenceChange(DocHeightKey.self) { height = $0 }
+            .scaleEffect(s, anchor: .topLeading)
+            .frame(width: w, height: height * s, alignment: .topLeading)
+            .clipShape(RoundedRectangle(cornerRadius: 10)).shadow(color: .black.opacity(0.5), radius: 20, y: 10)
     }
 }
 

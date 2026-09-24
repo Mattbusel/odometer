@@ -123,13 +123,15 @@ struct DigitWheel: View {
         let h = size * 1.3
         ZStack {
             RoundedRectangle(cornerRadius: 5, style: .continuous).fill(last ? Dash.cream : Color(red: 0.16, green: 0.16, blue: 0.15))
-            VStack(spacing: 0) {
-                ForEach(0..<10, id: \.self) { d in
-                    Text("\(d)").font(.mono(size, .black)).foregroundStyle(last ? Dash.bg : Dash.cream).frame(width: size * 0.78, height: h)
+            Color.clear.frame(width: size * 0.78, height: h).overlay(
+                VStack(spacing: 0) {
+                    ForEach(0..<10, id: \.self) { d in
+                        Text("\(d)").font(.mono(size, .black)).foregroundStyle(last ? Dash.bg : Dash.cream).frame(width: size * 0.78, height: h)
+                    }
                 }
-            }
-            .offset(y: -CGFloat(digit) * h + h * 4.5)
-            .animation(.spring(duration: 0.9, bounce: 0.15), value: digit)
+                .offset(y: -CGFloat(digit) * h + h * 4.5)
+                .animation(.spring(duration: 0.9, bounce: 0.15), value: digit)
+            )
             LinearGradient(colors: [.black.opacity(0.55), .clear, .clear, .black.opacity(0.55)], startPoint: .top, endPoint: .bottom).allowsHitTesting(false)
         }
         .frame(width: size * 0.78, height: h).clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
