@@ -56,7 +56,7 @@ enum Sheet: Identifiable {
 final class Router {
     var tab: Tab = .car
     var sheet: Sheet? = nil
-    func applyShotArgs(_ s: Store, _ pro: Pro) {
+    @MainActor func applyShotArgs(_ s: Store, _ pro: Pro) {
         let a = ProcessInfo.processInfo.arguments
         guard let i = a.firstIndex(of: "-shot"), i + 1 < a.count else { return }
         switch a[i + 1] {
