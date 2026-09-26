@@ -7,6 +7,7 @@ import UIKit
 struct GarageStrip: View {
     @Environment(Store.self) private var store
     @Environment(Router.self) private var router
+    @Environment(Pro.self) private var pro
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
@@ -26,8 +27,11 @@ struct GarageStrip: View {
                         .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(on ? Dash.amber.opacity(0.7) : Dash.line))
                     }.buttonStyle(.plain)
                 }
-                Button { router.sheet = .vehicle(Vehicle()) } label: {
-                    Image(systemName: "plus").font(.system(size: 14, weight: .black)).foregroundStyle(Dash.grey).frame(width: 36, height: 36)
+                Button {
+                    // The first vehicle is free; the garage is Pro.
+                    if pro.unlocked || store.vehicles.isEmpty { router.sheet = .vehicle(Vehicle()) } else { pro.ask(.garage) }
+                } label: {
+                    Image(systemName: pro.unlocked || store.vehicles.isEmpty ? "plus" : "lock.fill").font(.system(size: 14, weight: .black)).foregroundStyle(Dash.grey).frame(width: 36, height: 36)
                         .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Dash.card)).overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Dash.line2))
                 }.buttonStyle(.plain)
             }.padding(.horizontal, 16)
@@ -54,6 +58,7 @@ struct EmptyGarage: View {
 struct CarView: View {
     @Environment(Store.self) private var store
     @Environment(Router.self) private var router
+    @Environment(Pro.self) private var pro
     var body: some View {
         if let v = store.car {
             let sched = store.schedule(v), overdue = sched.filter { $0.status == .overdue }, soon = sched.filter { $0.status == .soon }
@@ -112,7 +117,7 @@ struct CarView: View {
                     }
                 }.tile()
                 HStack(spacing: 10) {
-                    GreyButton(title: "Service history", icon: "doc.text.fill") { router.sheet = .history }
+                    GreyButton(title: "Service history", icon: pro.unlocked ? "doc.text.fill" : "lock.fill") { if pro.unlocked { router.sheet = .history } else { pro.ask(.history) } }
                     GreyButton(title: "Log a service", icon: "wrench.fill") { router.sheet = .service(nil) }
                 }
             }
@@ -716,6 +721,7 @@ struct IntervalRow: View {
 
 struct SettingsSheet: View {
     @Environment(Store.self) private var store
+    @Environment(Pro.self) private var pro
     @Environment(\.dismiss) private var dismiss
     var body: some View {
         @Bindable var store = store
@@ -735,10 +741,17 @@ struct SettingsSheet: View {
                 }.padding(.vertical, 10)
             }.tile(padding: 14)
             .onChange(of: store.settings.metric) { _, _ in store.save() }.onChange(of: store.settings.litres) { _, _ in store.save() }.onChange(of: store.settings.currency) { _, _ in store.save() }
+            ProCard()
             if let v = store.car {
                 Eyebrow("Export").padding(.top, 6)
-                ShareLink(item: csvURL(v)) {
-                    HStack { Image(systemName: "tablecells").foregroundStyle(Dash.amber); Text("CSV of everything for \(v.title)").font(.ui(14, .heavy)).foregroundStyle(Dash.cream); Spacer(); Image(systemName: "square.and.arrow.up").foregroundStyle(Dash.dim) }.tile(padding: 14, radius: 14)
+                if pro.unlocked {
+                    ShareLink(item: csvURL(v)) {
+                        HStack { Image(systemName: "tablecells").foregroundStyle(Dash.amber); Text("CSV of everything for \(v.title)").font(.ui(14, .heavy)).foregroundStyle(Dash.cream); Spacer(); Image(systemName: "square.and.arrow.up").foregroundStyle(Dash.dim) }.tile(padding: 14, radius: 14)
+                    }
+                } else {
+                    Button { pro.ask(.export) } label: {
+                        HStack { Image(systemName: "tablecells").foregroundStyle(Dash.amber); Text("CSV of everything for \(v.title)").font(.ui(14, .heavy)).foregroundStyle(Dash.cream); Spacer(); Image(systemName: "lock.fill").foregroundStyle(Dash.dim) }.tile(padding: 14, radius: 14)
+                    }.buttonStyle(.plain)
                 }
             }
             Text("Everything is stored on this phone in a single file. Nothing is sent anywhere.").font(.ui(12, .medium)).foregroundStyle(Dash.dim)
